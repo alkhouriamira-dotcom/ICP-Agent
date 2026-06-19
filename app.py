@@ -11,9 +11,9 @@ def get_rtl_html(text, is_error=False, tag_text=""):
         color = "#FEB2B2"  # أحمر ناعم وجذاب للاعتذار
     
     tag_html = f"<span style='color: #F6AD55; font-weight: bold;'>{tag_text}</span> " if tag_text else ""
-    return f"<div style='text-align: right; direction: rtl; color: {color}; font-family: Segoe UI; font-weight: bold; line-height: 1.8; margin-bottom: 8px;'>{tag_html}{text}</div>"
+    return f"<div style='text-align: right; direction: rtl; color: {color}; font-family: Segoe UI; font-weight: bold; line-height: 1.6; margin-bottom: 8px;'>{tag_html}{text}</div>"
 
-# هيدر فخم ونظيف جداً بدون أي شعار بصري خارجي لتوفير أقصى درجات الراحة والوقار
+# هيدر فخم ونظيف جداً بدون أي شعار بصري لتوفير أقصى درجات الراحة والوقار للعين
 str_lib.markdown("""
     <div style='background-color: #0F1E36; padding: 25px; text-align: center; border-bottom: 4px solid #D4AF37; border-radius: 8px;'>
         <h2 style='color: white; font-family: Segoe UI; margin:0; font-size: 20px; font-weight: bold;'>الهيئة الاتحادية للهوية والجنسية والجمارك وأمن المنافذ</h2>
@@ -172,7 +172,7 @@ if str_lib.session_state.trigger_process:
                 get_rtl_html("إرسال إشعار فوري وتنبيه لهاتف الضامن لسداد الرسوم المالية المقررة والاعتماد اللحظي.", tag_text="[💬 الإجراء القادم]:")
             ])
 
-    # انطلاق التدفق التتابعي الفاخر
+    # انطلاق تأثير التدفق التتابعي التدريجي الفاخر
     for i in range(len(lines)):
         current_html = html_content + "".join(lines[:i+1]) + "</div>"
         terminal_placeholder.markdown(current_html, unsafe_allow_html=True)
