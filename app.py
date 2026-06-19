@@ -13,7 +13,7 @@ def get_rtl_html(text, is_error=False, tag_text=""):
     tag_html = f"<span style='color: #F6AD55; font-weight: bold;'>{tag_text}</span> " if tag_text else ""
     return f"<div style='text-align: right; direction: rtl; color: {color}; font-family: Segoe UI; font-weight: bold; line-height: 1.8; margin-bottom: 8px;'>{tag_html}{text}</div>"
 
-# هيدر فخم ونظيف جداً بدون أي شعار بصري لتوفير أقصى درجات الراحة والوقار للعين
+# هيدر فخم ونظيف يحمل المسمى الرسمي الكامل والجديد للهيئة الموقرة
 str_lib.markdown("""
     <div style='background-color: #0F1E36; padding: 25px; text-align: center; border-bottom: 4px solid #D4AF37; border-radius: 8px;'>
         <h2 style='color: white; font-family: Segoe UI; margin:0; font-size: 20px; font-weight: bold;'>الهيئة الاتحادية للهوية والجنسية والجمارك وأمن المنافذ</h2>
@@ -37,14 +37,14 @@ government_scenarios = {
     "3": {"salary": 18000, "has_contract": False, "contract_details": "لا يوجد عقد سكن فعال مسجل باسم الضامن في البلديات"}
 }
 str_lib.write("")
-# خطوة 1: التحقق الرقمي ومحاذاة مركزية مريحة للعين
+# خطوة 1: التحقق الرقمي المحدث (تم إلغاء كلمة مواطن بنجاح)
 str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>🔒 خطوة 1: التحقق الرقمي والربط السيادي</h3>", unsafe_allow_html=True)
 if not str_lib.session_state.logged_in:
     if str_lib.button("🔐 تسجيل الدخول عبر الهوية الرقمية UAE Pass", type="primary", use_container_width=True):
         str_lib.session_state.logged_in = True
         str_lib.rerun()
 else:
-    str_lib.markdown("<div style='background-color: #C6F6D5; padding: 12px; border-radius: 6px; text-align: center; color: #22543D; font-weight: bold; font-family: Segoe UI; border: 1px solid #48BB78; width: 100%;'>✓ تم التحقق وتفعيل الهوية الرقمية بنجاح <br> الضامن: أحمد عبدالله (ملف نشط)</div>", unsafe_allow_html=True)
+    str_lib.markdown("<div style='background-color: #C6F6D5; padding: 12px; border-radius: 6px; text-align: center; color: #22543D; font-weight: bold; font-family: Segoe UI; border: 1px solid #48BB78; width: 100%;'>✓ تم التحقق وتفعيل الهوية الرقمية بنجاح <br> الضامن: أحمد عبدالله (ملف ضامن نشط)</div>", unsafe_allow_html=True)
 
 # خطوة 2: محاكاة السجلات بالتوسيط البصري التام
 str_lib.write("")
@@ -62,7 +62,6 @@ str_lib.markdown("""
         justify-content: center !important;
         text-align: center;
     }
-    /* كود تحريك الأشرطة الصوتية نيون حيوياً داخل المتصفح */
     @keyframes pulse {
         0%, 100% { height: 8px; }
         50% { height: 28px; }
@@ -86,13 +85,17 @@ selected_id = "1"
 if "الحالة 2" in scenario_key: selected_id = "2"
 elif "الحالة 3" in scenario_key: selected_id = "3"
 
-# خطوة 3: منطقة الميكروفون والموجة التفاعلية المدمجة بنسبة 100%
+# خطوة 3: منطقة الميكروفون
 str_lib.write("")
 str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>🎙️ خطوة 3: معالجة اللغات الطبيعية ومطابقة نبرة الصوت</h3>", unsafe_allow_html=True)
 
-dialect = str_lib.radio("", ["🇦🇪 لهجة إماراتية", "🇱🇧 لهجة لبنانية", "🇪🇬 لهجة مصرية"], horizontal=True, label_visibility="collapsed")
+def handle_dialect_change():
+    str_lib.session_state.is_recording = False
+    str_lib.session_state.asked_before = False
+    str_lib.session_state.trigger_process = False
 
-# حقن الأشرطة المتحركة كودياً بداخل الصندوق الأسود لتتحرك حقيقة دون صور خارجية مكسورة
+dialect = str_lib.radio("", ["🇦🇪 لهجة إماراتية", "🇱🇧 لهجة لبنانية", "🇪🇬 لهجة مصرية"], horizontal=True, label_visibility="collapsed", on_change=handle_dialect_change)
+
 if str_lib.session_state.is_recording:
     str_lib.markdown("""
         <div style='display: flex; justify-content: center; align-items: center; background-color: #1A202C; padding: 10px; border-radius: 6px; height: 45px;'>
@@ -111,8 +114,10 @@ str_lib.write("")
 
 if str_lib.button("🎙️ اضغط هنا للتحدث الآن والبدء الفوري", use_container_width=True):
     str_lib.session_state.is_recording = True
+    str_lib.session_state.asked_before = False
+    str_lib.session_state.trigger_process = False
     str_lib.rerun()
-# معالجة ثواني الاستماع وإطفاء الموجة آلياً بعد انتهاء النطق
+# التحكم الصارم في ثواني الاستماع ومسح الحالة آلياً
 if str_lib.session_state.is_recording and not str_lib.session_state.asked_before:
     time.sleep(3.0) 
     str_lib.session_state.is_recording = False
@@ -204,7 +209,6 @@ if str_lib.session_state.trigger_process:
                 get_rtl_html("إرسال إشعار فوري وتنبيه لهاتف الضامن لسداد الرسوم المالية المقررة والاعتماد اللحظي.", tag_text="[💬 الإجراء القادم]:")
             ])
 
-    # انطلاق تأثير التدفق التتابعي التدريجي الفاخر
     for i in range(len(lines)):
         current_html = html_content + "".join(lines[:i+1]) + "</div>"
         terminal_placeholder.markdown(current_html, unsafe_allow_html=True)
