@@ -2,7 +2,7 @@ import streamlit as str_lib
 import time
 
 # 1. إعدادات الصفحة المخصصة للهواتف والمتصفح
-str_lib.set_page_config(page_title="الهيئة الاتحادية للهوية والجنسية", page_icon="🎙️", layout="centered")
+str_lib.set_page_config(page_title="الهيئة الاتحادية للهوية والجنسية والجمارك وأمن المنافذ", page_icon="🎙️", layout="centered")
 
 # دالة ذكية لبناء نصوص الـ HTML المحاذية لليمين (RTL) بشكل صلب ومستقر
 def get_rtl_html(text, is_error=False, tag_text=""):
@@ -62,6 +62,17 @@ str_lib.markdown("""
         justify-content: center !important;
         text-align: center;
     }
+    /* كود تحريك الأشرطة الصوتية نيون حيوياً داخل المتصفح */
+    @keyframes pulse {
+        0%, 100% { height: 8px; }
+        50% { height: 28px; }
+    }
+    .bar {
+        width: 5px;
+        background-color: #3182CE;
+        margin: 0 4px;
+        border-radius: 3px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -75,15 +86,25 @@ selected_id = "1"
 if "الحالة 2" in scenario_key: selected_id = "2"
 elif "الحالة 3" in scenario_key: selected_id = "3"
 
-# خطوة 3: منطقة الميكروفون والموجة الصوتية التفاعلية المحدثة
+# خطوة 3: منطقة الميكروفون والموجة التفاعلية المدمجة بنسبة 100%
 str_lib.write("")
 str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>🎙️ خطوة 3: معالجة اللغات الطبيعية ومطابقة نبرة الصوت</h3>", unsafe_allow_html=True)
 
 dialect = str_lib.radio("", ["🇦🇪 لهجة إماراتية", "🇱🇧 لهجة لبنانية", "🇪🇬 لهجة مصرية"], horizontal=True, label_visibility="collapsed")
 
-# حقن موجة صوتية نيون متحركة حقيقية (GIF سحابي ذكي ومستقر) بدلاً من الخطوط الثابتة القديمة
+# حقن الأشرطة المتحركة كودياً بداخل الصندوق الأسود لتتحرك حقيقة دون صور خارجية مكسورة
 if str_lib.session_state.is_recording:
-    str_lib.markdown("<div style='display: flex; justify-content: center; background-color: #1A202C; padding: 10px; border-radius: 6px;'><img src='https://pixabay.com' style='width: 350px; height: 35px; object-fit: cover;'></div>", unsafe_allow_html=True)
+    str_lib.markdown("""
+        <div style='display: flex; justify-content: center; align-items: center; background-color: #1A202C; padding: 10px; border-radius: 6px; height: 45px;'>
+            <div class='bar' style='animation: pulse 0.6s infinite 0.1s;'></div>
+            <div class='bar' style='animation: pulse 0.5s infinite 0.3s;'></div>
+            <div class='bar' style='animation: pulse 0.7s infinite 0.2s;'></div>
+            <div class='bar' style='animation: pulse 0.4s infinite 0.4s;'></div>
+            <div class='bar' style='animation: pulse 0.6s infinite 0.1s;'></div>
+            <div class='bar' style='animation: pulse 0.8s infinite 0.5s;'></div>
+            <div class='bar' style='animation: pulse 0.5s infinite 0.2s;'></div>
+        </div>
+    """, unsafe_allow_html=True)
 else:
     str_lib.markdown("<div style='background-color: #1A202C; padding: 10px; text-align: center; border-radius: 6px; color: #4A5568; font-weight: bold; letter-spacing: 2px;'>🚨 الميكروفون في وضع السكون - اضغط بالأسفل للتحدث</div>", unsafe_allow_html=True)
 str_lib.write("")
@@ -93,7 +114,7 @@ if str_lib.button("🎙️ اضغط هنا للتحدث الآن والبدء ا
     str_lib.rerun()
 # معالجة ثواني الاستماع وإطفاء الموجة آلياً بعد انتهاء النطق
 if str_lib.session_state.is_recording and not str_lib.session_state.asked_before:
-    time.sleep(3.0) # تظل الموجة النيون تنبض وتتحرك لمدة 3 ثوانٍ كاملة أمام اللجنة أثناء تحدثكِ
+    time.sleep(3.0) 
     str_lib.session_state.is_recording = False
     str_lib.session_state.asked_before = True
     if not str_lib.session_state.logged_in:
@@ -173,7 +194,7 @@ if str_lib.session_state.trigger_process:
         elif selected_id == "3":
             lines.extend([
                 get_rtl_html("قرار الوكيل الذكي هو تعليق الطلب واعتذار تلقائي للمتعامل.", is_error=True, tag_text="[❌ قرار النظام]:"),
-                get_rtl_html("لم يتم الع العثور على عقد سكن أو عقد إيجاري معتمد فعال باسم الضامن لدى البلديات المحلية.", is_error=True, tag_text="[سبب الرفض]:"),
+                get_rtl_html("لم يتم العثور على عقد سكن أو عقد إيجاري معتمد فعال باسم الضامن لدى البلديات المحلية.", is_error=True, tag_text="[سبب الرفض]:"),
                 get_rtl_html("نعتذر منك، لم نجد عقد إيجار موثق مسجل باسم الضامن، وهو أحد المتطلبات الأساسية لإصدار تأشيرة الزيارة للاستضافة الأسرية.", is_error=True, tag_text="[💬 الرد الصوتي المقترح]:")
             ])
         else:
