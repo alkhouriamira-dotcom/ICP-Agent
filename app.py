@@ -39,9 +39,7 @@ government_scenarios = {
     "3": {"salary": 18000, "has_contract": False, "contract_details": "لا يوجد عقد سكن فعال مسجل باسم الضامن في البلديات"}
 }
 str_lib.write("")
-# بوابـة التحقق والتحكم الذكي المدمج
-str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>🔒 بوابـة التحقق والتحكم الذكي المدمج</h3>", unsafe_allow_html=True)
-
+# تنسيقات الواجهة العامة لضمان التوسط والتناسق
 str_lib.markdown("""
     <style>
     div[data-testid="stSelectbox"] {
@@ -67,11 +65,37 @@ str_lib.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# عرض حالة الهوية الرقمية في الأعلى إذا كان مسجلاً للدخول
+# خطوة 1 المحدثة: تحديد المعطيات والسيناريوهات في الأعلى تماماً لقراءة تتابعية سليمة
+str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>⚙️ خطوة 1: تهيئة معطيات النظام وسيناريو الفحص</h3>", unsafe_allow_html=True)
+
+# دوال لتصفير حالة الرصد تلقائياً عند تغيير المعطيات لمنع قفز التنبيهات مسبقاً
+def on_scenario_change():
+    str_lib.session_state.asked_before = False
+    str_lib.session_state.trigger_process = False
+    str_lib.session_state.authorized = False
+
+scenario_key = str_lib.selectbox("", [
+    "🟢 الحالة 1: ملف ضامن مستوفي الشروط (نجاح واستحقاق تلقائي)",
+    "🟡 الحالة 2: راتب الضامن أقل من الاشتراطات المعتمدة للاستضافة",
+    "🔴 الحالة 3: عقد سكن الضامن غير مسجل أو منتهي في البلدية"
+], index=0, label_visibility="collapsed", key="system_scenario_selection", on_change=on_scenario_change)
+
+selected_id = "1"
+if "الحالة 2" in scenario_key: selected_id = "2"
+elif "الحالة 3" in scenario_key: selected_id = "3"
+
+dialect = str_lib.radio("", ["🇦🇪 لهجة إماراتية", "🇱🇧 لهجة لبنانية", "🇪🇬 لهجة مصرية"], horizontal=True, label_visibility="collapsed", key="user_dialect_selection", on_change=on_scenario_change)
+
+
+# خطوة 2 المحدثة: بوابـة التحقق والتحكم الذكي
+str_lib.write("---")
+str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>🔒 خطوة 2: بوابـة التحقق والتحكم الذكي المدمج</h3>", unsafe_allow_html=True)
+
+# عرض حالة الهوية الرقمية إذا كان مسجلاً للدخول
 if str_lib.session_state.logged_in:
     str_lib.markdown("<div style='background-color: #C6F6D5; padding: 12px; border-radius: 6px; text-align: center; color: #22543D; font-weight: bold; font-family: Segoe UI; border: 1px solid #48BB78; width: 100%; margin-bottom: 15px;'>✓ تم التحقق وتفعيل الهوية الرقمية بنجاح <br> الضامن: أحمد عبدالله (ملف ضامن نشط)</div>", unsafe_allow_html=True)
 
-# إنشاء أعمدة لوضع الأزرار بجانب بعضها البعض
+# إنشاء أعمدة لوضع الأزرار بجانب بعضها البعض أفقياً
 col_login, col_voice = str_lib.columns(2)
 
 with col_login:
@@ -98,9 +122,6 @@ with col_voice:
             str_lib.session_state.authorized = False
             str_lib.rerun()
 
-# اختيار اللهجة الموائمة أسفل الأزرار المباشرة
-dialect = str_lib.radio("", ["🇦🇪 لهجة إماراتية", "🇱🇧 لهجة لبنانية", "🇪🇬 لهجة مصرية"], horizontal=True, label_visibility="collapsed", key="user_dialect_selection")
-
 # معالجة الأنيميشن الصوتي والانتظار دون تجميد الصفحة
 if str_lib.session_state.is_recording and not str_lib.session_state.asked_before:
     str_lib.markdown("""
@@ -120,24 +141,10 @@ if str_lib.session_state.is_recording and not str_lib.session_state.asked_before
     str_lib.session_state.asked_before = True
     str_lib.session_state.trigger_process = True 
     str_lib.rerun()
-
-# خطوة محاكاة قواعد البيانات والشركاء المربوطين
-str_lib.write("---")
-str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>📊 محاكاة قواعد البيانات والشركاء المربوطين</h3>", unsafe_allow_html=True)
-
-scenario_key = str_lib.selectbox("", [
-    "🟢 الحالة 1: ملف ضامن مستوفي الشروط (نجاح واستحقاق تلقائي)",
-    "🟡 الحالة 2: راتب الضامن أقل من الاشتراطات المعتمدة للاستضافة",
-    "🔴 الحالة 3: عقد سكن الضامن غير مسجل أو منتهي في البلدية"
-], index=0, label_visibility="collapsed", key="system_scenario_selection")
-
-selected_id = "1"
-if "الحالة 2" in scenario_key: selected_id = "2"
-elif "الحالة 3" in scenario_key: selected_id = "3"
-# تفعيل منطق تفويض حوكمة الوكيل الذكي وعرض الـ Logs بناء على تسجيل الدخول
+# خطوة 3: تفعيل منطق تفويض حوكمة الوكيل الذكي وعرض الـ Logs بناء على تسجيل الدخول
 if str_lib.session_state.trigger_process:
     
-    # 1. إذا كان المستخدم غير مسجل دخول: يظهر اللوج ومعه زر الدخول الفوري المدمج أسفله
+    # 1. إذا كان المستخدم غير مسجل دخول: يظهر لوج الفحص الذكي وبأسفله زر الدخول الفوري المباشر
     if not str_lib.session_state.logged_in:
         str_lib.write("---")
         str_lib.markdown("<h4 style='text-align: right; direction: rtl; color: #0F1E36;'>🖥️ شاشة رصد وتحليلات الوكيل الذكي الاستباقي (ICP Agent Log)</h4>", unsafe_allow_html=True)
@@ -161,7 +168,7 @@ if str_lib.session_state.trigger_process:
             str_lib.session_state.logged_in = True
             str_lib.rerun()
 
-    # 2. إذا كان مسجل دخول لكن لم يعطِ التفويض والحوكمة بعد: تظهر نافذة الحוكمة
+    # 2. إذا كان مسجل دخول لكن لم يعطِ التفويض والحوكمة بعد: تظهر نافذة الحوكمة الذكية المتسلسلة
     elif str_lib.session_state.logged_in and not str_lib.session_state.authorized:
         str_lib.write("---")
         str_lib.markdown("""
@@ -185,7 +192,7 @@ if str_lib.session_state.trigger_process:
                 str_lib.session_state.authorized = False
                 str_lib.rerun()
 
-    # 3. إذا كان مسجل دخول ومفوض: يبدأ عرض شاشة الفحص والتحليل الكامل والنهائي بدون تكرار
+    # 3. إذا كان مسجل دخول ومفوض: يبدأ عرض شاشة الفحص والتحليل الكامل والنهائي
     elif str_lib.session_state.logged_in and str_lib.session_state.authorized:
         str_lib.write("---")
         str_lib.markdown("<h4 style='text-align: right; direction: rtl; color: #0F1E36;'>🖥️ شاشة رصد وتحليلات الوكيل الذكي الاستباقي (ICP Agent Log)</h4>", unsafe_allow_html=True)
@@ -230,7 +237,7 @@ if str_lib.session_state.trigger_process:
                 get_rtl_html("إرسال إشعار فوري وتنبيه لهاتف الضامن لسداد الرسوم المالية المقررة والاعتماد اللحظي.", tag_text="[💬 الإجراء القادم]:")
             ])
 
-        # تشغيل حلقة العرض التدريجي لمرة واحدة وبثبات تام
+        # تشغيل حلقة العرض التدريجي
         for i in range(len(lines)):
             current_html = html_content + "".join(lines[:i+1]) + "</div>"
             terminal_placeholder.markdown(current_html, unsafe_allow_html=True)
