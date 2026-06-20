@@ -1,3 +1,6 @@
+# ==========================================
+# الجزء الأول: الإعدادات، التهيئة، والهيدر الرسمي
+# ==========================================
 import streamlit as str_lib
 import time
 
@@ -37,18 +40,12 @@ government_scenarios = {
     "3": {"salary": 18000, "has_contract": False, "contract_details": "لا يوجد عقد سكن فعال مسجل باسم الضامن في البلديات"}
 }
 str_lib.write("")
-# خطوة 1: التحقق الرقمي المحدث (تم إلغاء كلمة مواطن بنجاح)
-str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>🔒 خطوة 1: التحقق الرقمي والربط السيادي</h3>", unsafe_allow_html=True)
-if not str_lib.session_state.logged_in:
-    if str_lib.button("🔐 تسجيل الدخول عبر الهوية الرقمية UAE Pass", type="primary", use_container_width=True):
-        str_lib.session_state.logged_in = True
-        str_lib.rerun()
-else:
-    str_lib.markdown("<div style='background-color: #C6F6D5; padding: 12px; border-radius: 6px; text-align: center; color: #22543D; font-weight: bold; font-family: Segoe UI; border: 1px solid #48BB78; width: 100%;'>✓ تم التحقق وتفعيل الهوية الرقمية بنجاح <br> الضامن: أحمد عبدالله (ملف ضامن نشط)</div>", unsafe_allow_html=True)
+# ==========================================
+# الجزء الثاني: الأزرار المدمجة، المايكروفون وقواعد البيانات
+# ==========================================
 
-# خطوة 2: محاكاة السجلات بالتوسيط البصري التام
-str_lib.write("")
-str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>📊 خطوة 2: محاكاة قواعد البيانات والشركاء المربوطين</h3>", unsafe_allow_html=True)
+# خطوة 1 و 3 المدمجة: التحقق الرقمي والتحكم الصوتي بجانب بعضهما البعض
+str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>🔒 بوابـة التحقق والتحكم الذكي المدمج</h3>", unsafe_allow_html=True)
 
 str_lib.markdown("""
     <style>
@@ -75,30 +72,44 @@ str_lib.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-scenario_key = str_lib.selectbox("", [
-    "🟢 الحالة 1: ملف ضامن مستوفي الشروط (نجاح واستحقاق تلقائي)",
-    "🟡 الحالة 2: راتب الضامن أقل من الاشتراطات المعتمدة للاستضافة",
-    "🔴 الحالة 3: عقد سكن الضامن غير مسجل أو منتهي في البلدية"
-], index=0, label_visibility="collapsed")
+# عرض حالة الهوية الرقمية في الأعلى إذا كان مسجلاً للدخول
+if str_lib.session_state.logged_in:
+    str_lib.markdown("<div style='background-color: #C6F6D5; padding: 12px; border-radius: 6px; text-align: center; color: #22543D; font-weight: bold; font-family: Segoe UI; border: 1px solid #48BB78; width: 100%; margin-bottom: 15px;'>✓ تم التحقق وتفعيل الهوية الرقمية بنجاح <br> الضامن: أحمد عبدالله (ملف ضامن نشط)</div>", unsafe_allow_html=True)
 
-selected_id = "1"
-if "الحالة 2" in scenario_key: selected_id = "2"
-elif "الحالة 3" in scenario_key: selected_id = "3"
+# إنشاء أعمدة لوضع الأزرار بجانب بعضها البعض
+col_login, col_voice = str_lib.columns(2)
 
-# خطوة 3: منطقة الميكروفون
-str_lib.write("")
-str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>🎙️ خطوة 3: معالجة اللغات الطبيعية ومطابقة نبرة الصوت</h3>", unsafe_allow_html=True)
+with col_login:
+    if not str_lib.session_state.logged_in:
+        if str_lib.button("🔐 دخول عبر UAE Pass", type="primary", use_container_width=True):
+            str_lib.session_state.logged_in = True
+            if str_lib.session_state.asked_before: # إذا كان قادماً من تنبيه عدم الدخول، يفعل المعالجة فوراً
+                str_lib.session_state.trigger_process = True
+            str_lib.rerun()
+    else:
+        str_lib.button("🔒 الهوية الرقمية نشطة", type="secondary", use_container_width=True, disabled=True)
 
-def handle_dialect_change():
-    str_lib.session_state.is_recording = False
-    str_lib.session_state.asked_before = False
-    str_lib.session_state.trigger_process = False
+with col_voice:
+    if not str_lib.session_state.asked_before:
+        if str_lib.button("🎙️ اضغط هنا للتحدث الآن", use_container_width=True):
+            str_lib.session_state.is_recording = True
+            str_lib.session_state.asked_before = False
+            str_lib.session_state.trigger_process = False
+            str_lib.rerun()
+    else:
+        if str_lib.button("🔄 تصفير وتحدث مجدداً", use_container_width=True):
+            str_lib.session_state.asked_before = False
+            str_lib.session_state.trigger_process = False
+            str_lib.session_state.is_recording = False
+            str_lib.rerun()
 
-dialect = str_lib.radio("", ["🇦🇪 لهجة إماراتية", "🇱🇧 لهجة لبنانية", "🇪🇬 لهجة مصرية"], horizontal=True, label_visibility="collapsed", on_change=handle_dialect_change)
+# اختيار اللهجة الموائمة أسفل الأزرار المباشرة
+dialect = str_lib.radio("", ["🇦🇪 لهجة إماراتية", "🇱🇧 لهجة لبنانية", "🇪🇬 لهجة مصرية"], horizontal=True, label_visibility="collapsed")
 
-if str_lib.session_state.is_recording:
+# معالجة الأنيميشن الصوتي والانتظار دون تجميد الصفحة
+if str_lib.session_state.is_recording and not str_lib.session_state.asked_before:
     str_lib.markdown("""
-        <div style='display: flex; justify-content: center; align-items: center; background-color: #1A202C; padding: 10px; border-radius: 6px; height: 45px;'>
+        <div style='display: flex; justify-content: center; align-items: center; background-color: #1A202C; padding: 10px; border-radius: 6px; height: 45px; margin-top: 10px;'>
             <div class='bar' style='animation: pulse 0.6s infinite 0.1s;'></div>
             <div class='bar' style='animation: pulse 0.5s infinite 0.3s;'></div>
             <div class='bar' style='animation: pulse 0.7s infinite 0.2s;'></div>
@@ -108,50 +119,33 @@ if str_lib.session_state.is_recording:
             <div class='bar' style='animation: pulse 0.5s infinite 0.2s;'></div>
         </div>
     """, unsafe_allow_html=True)
-else:
-    str_lib.markdown("<div style='background-color: #1A202C; padding: 10px; text-align: center; border-radius: 6px; color: #4A5568; font-weight: bold; letter-spacing: 2px;'>🚨 الميكروفون في وضع السكون - اضغط بالأسفل للتحدث</div>", unsafe_allow_html=True)
-str_lib.write("")
-
-if str_lib.button("🎙️ اضغط هنا للتحدث الآن والبدء الفوري", use_container_width=True):
-    str_lib.session_state.is_recording = True
-    str_lib.session_state.asked_before = False
-    str_lib.session_state.trigger_process = False
-    str_lib.rerun()
-# التحكم الصارم في ثواني الاستماع ومسح الحالة آلياً
-if str_lib.session_state.is_recording and not str_lib.session_state.asked_before:
-    time.sleep(3.0) 
+    
+    time.sleep(2.5)
     str_lib.session_state.is_recording = False
     str_lib.session_state.asked_before = True
-    if not str_lib.session_state.logged_in:
-        str_lib.session_state.trigger_process = True
+    str_lib.session_state.trigger_process = True # يتم توجيهه تلقائياً لمعالجة الطلب
     str_lib.rerun()
 
-# تفويض حوكمة الوكيل الذكي (سؤال نعم/لا الموسط)
-if str_lib.session_state.logged_in and str_lib.session_state.asked_before and not str_lib.session_state.trigger_process:
-    str_lib.write("---")
-    str_lib.markdown("""
-        <div style='text-align: right; direction: rtl; background-color: #F7FAFC; padding: 15px; border-radius: 8px; color: #2B6CB0; font-weight: bold; font-family: Segoe UI; border-right: 5px solid #3182CE; box-shadow: 0 2px 4px rgba(0,0,0,0.05);'>
-            🧠 <b>تفويض حوكمة الوكيل الذكي (Contextual Authorization):</b><br>
-            لقد رصد النظام رغبتك في التقديم على خدمة <span style='color: #D4AF37;'>[تأشيرة زيارة الأم]</span>.<br><br>
-            هل تمنح الوكيل الذكي تفويضاً قانونياً للاتصال بالشركاء وسحب وثائقك الرسمية من الوزارات لإتمام المعاملة فوراً؟
-        </div>
-    """, unsafe_allow_html=True)
-    str_lib.write("")
-    
-    col1, col2 = str_lib.columns(2)
-    with col1:
-        if str_lib.button("✅ نعم، أمنح التفويض وأبدأ المعاملة آلياً", use_container_width=True):
-            str_lib.session_state.trigger_process = True
-            str_lib.rerun() 
-    with col2:
-        if str_lib.button("❌ لا، إلغِ هذا الطلب", use_container_width=True):
-            str_lib.session_state.asked_before = False
-            str_lib.session_state.trigger_process = False
-            str_lib.rerun()
+# خطوة محاكاة قواعد البيانات والشركاء المربوطين
+str_lib.write("---")
+str_lib.markdown("<h3 style='text-align: center; direction: rtl;'>📊 محاكاة قواعد البيانات والشركاء المربوطين</h3>", unsafe_allow_html=True)
+
+scenario_key = str_lib.selectbox("", [
+    "🟢 الحالة 1: ملف ضامن مستوفي الشروط (نجاح واستحقاق تلقائي)",
+    "🟡 الحالة 2: راتب الضامن أقل من الاشتراطات المعتمدة للاستضافة",
+    "🔴 الحالة 3: عقد سكن الضامن غير مسجل أو منتهي في البلدية"
+], index=0, label_visibility="collapsed")
+
+selected_id = "1"
+if "الحالة 2" in scenario_key: selected_id = "2"
+elif "الحالة 3" in scenario_key: selected_id = "3"
+# ==========================================
+# الجزء الثالث: شاشة الرصد، منطق الفحص والأزرار المباشرة
+# ==========================================
 
 # شاشة الرصد وفحص الشركاء بتوقيت التدفق الواقعي الصارم
 if str_lib.session_state.trigger_process:
-    str_lib.write("")
+    str_lib.write("---")
     str_lib.markdown("<h4 style='text-align: right; direction: rtl; color: #0F1E36;'>🖥️ شاشة رصد وتحليلات الوكيل الذكي الاستباقي (ICP Agent Log)</h4>", unsafe_allow_html=True)
     
     if "إماراتية" in dialect:
@@ -169,20 +163,33 @@ if str_lib.session_state.trigger_process:
         get_rtl_html("جاري معالجة نية المتعامل وتحليل اللهجة المحلية الممررة سحابياً.", tag_text="[🧠 معالجة اللغات]:"),
         get_rtl_html("النية المكتشفة هي طلب إصدار تأشيرة زيارة أقارب (الأم).", tag_text="[🎯 الفحص الذكي]:")
     ]
-    
+
     if not str_lib.session_state.logged_in:
         lines.extend([
             get_rtl_html("تنبيـه الحوكمة الأمنية - لم يتم كشف هوية رقمية نشطة بالمنصة.", is_error=True, tag_text="[🚫 حماية البيانات]:"),
             get_rtl_html("لإصدار هذه التأشيرة آلياً تطلب أنظمة الهيئة الاشتراطات والضوابط التالية:", is_error=True, tag_text="[📋 الاشتراطات المطلوبة]:"),
             get_rtl_html("فحص الراتب الشهري المعتمد لملف الضامن بحيث لا يقل عن عشرة آلاف درهم إماراتي.", is_error=True, tag_text="[💼 الشرط الأول - وزارة التوطين]:"),
             get_rtl_html("فحص صلاحية وتوثيق عقد سكن الضامن المسجل في السجلات السحابية للبلديات.", is_error=True, tag_text="[🏠 الشرط الثاني - البلديات المحلية]:"),
-            get_rtl_html("يرجى تسجيل الدخول عبر الهوية الرقمية (UAE Pass) أولاً ليتمكن النظام من إتمام فحص الشركاء المترابطين.", is_error=True, tag_text="[🔒 إجراء أمني مطلوب]:")
+            get_rtl_html("يرجى تسجيل الدخول الفوري عبر الزر المتاح أدناه للربط السيادي واستكمال الفحص آلياً دون الحاجة للصعود للأعلى.", is_error=True, tag_text="[🔒 إجراء أمني مطلوب]:")
         ])
-        str_lib.session_state.trigger_process = False
+        
+        # طباعة شاشة الرصد لغير المسجلين
+        for i in range(len(lines)):
+            current_html = html_content + "".join(lines[:i+1]) + "</div>"
+            terminal_placeholder.markdown(current_html, unsafe_allow_html=True)
+            time.sleep(0.8)
+            
+        # إضافة زر الدخول المباشر تحت الـ Terminal تماماً لعدم الصعود لأعلى الصفحة
+        str_lib.write("")
+        if str_lib.button("🔐 تسجيل دخول فوري ومتابعة الفحص آلياً", type="primary", use_container_width=True, key="terminal_login_btn"):
+            str_lib.session_state.logged_in = True
+            str_lib.session_state.trigger_process = True
+            str_lib.rerun()
+            
     else:
         current_sc = government_scenarios[selected_id]
         lines.extend([
-            get_rtl_html("الهوية الرقمية نشطة ومفوضة قانونياً. البدء فوراً في جلب ومطابقة سجلات الشركاء تلقائياً للضامن:", tag_text="[🚀 الوكيل الذكي]:"),
+            get_rtl_html("الهوية الرقمية نشطة ومفوضة قانونياً. البدء فوراً in جلب ومطابقة سجلات الشركاء تلقائياً للضامن:", tag_text="[🚀 الوكيل الذكي]:"),
             get_rtl_html("جاري فتح منفذ آمن ومخاطبة أنظمة وزارة الموارد البشرية والتوطين سحابياً...", tag_text="[💼 ربط حكومي - MOHRE]:"),
             get_rtl_html(f"تم جلب شهادة راتب الضامن الرقمية الموثقة بقيمة: {current_sc['salary']:,} درهم إماراتي.", tag_text="[📋 استجابة الشريك]:"),
             get_rtl_html("جاري فتح منفذ آمن ومخاطبة أنظمة دائرة الأراضي والأملاك والبلديات المحلية...", tag_text="[🏠 ربط حكومي - دائرة الأراضي والبلديات]:"),
@@ -209,7 +216,8 @@ if str_lib.session_state.trigger_process:
                 get_rtl_html("إرسال إشعار فوري وتنبيه لهاتف الضامن لسداد الرسوم المالية المقررة والاعتماد اللحظي.", tag_text="[💬 الإجراء القادم]:")
             ])
 
-    for i in range(len(lines)):
-        current_html = html_content + "".join(lines[:i+1]) + "</div>"
-        terminal_placeholder.markdown(current_html, unsafe_allow_html=True)
-        time.sleep(1.3)
+        # طباعة شاشة الرصد للمسجلين بالتدفق التدريجي
+        for i in range(len(lines)):
+            current_html = html_content + "".join(lines[:i+1]) + "</div>"
+            terminal_placeholder.markdown(current_html, unsafe_allow_html=True)
+            time.sleep(1.1)
